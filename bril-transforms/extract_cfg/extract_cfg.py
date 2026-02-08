@@ -6,6 +6,7 @@ TERMINATORS = (
     "jmp",
     "ret",
 )
+DEBUG = False
 
 
 def load_prg():
@@ -76,7 +77,7 @@ def cfg2dot(fname: str, cfg):
             node_txt += instr_txt + "\n"
         node = pydot.Node(
             block["name"],
-            label=f"<{create_left_justified_label(node_txt)}>",  # create_left_justified_label(node_txt),
+            label=f"<{create_left_justified_label(node_txt)}>",  
             shape="plaintext",
             xlabel=block["name"],
         )
@@ -108,15 +109,14 @@ def main():
     cfg_prg = []
     bnum = 0
     for fn in prg["functions"]:
-        # print(SEP)
         cfg_prg.append(copy(fn))
         cfg, bnum = form_cfg(fn["instrs"], bnum)
         cfg_prg[-1]["cfg"] = cfg
-        graph = cfg2dot(fn["name"], cfg)
-        # print(graph.to_string())
-        graph.write_png(f"{fn['name']}_graph.png")
+        if DEBUG:
+            graph = cfg2dot(fn["name"], cfg)
+            graph.write_png(f"{fn['name']}_graph.png")
     cfg_prg = dict(functions=cfg_prg)
-    # print(json.dumps(cfg_prg, indent=2))
+    print(json.dumps(cfg_prg))
     return
 
 
