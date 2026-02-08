@@ -90,7 +90,7 @@ def cfg2dot(fname: str, cfg):
 def json2bril(instr):
     import sys
 
-    sys.path.append("../../bril-txt")
+    sys.path.append("../../bril/bril-txt")
     import briltxt
 
     if is_label(instr):
