@@ -47,7 +47,7 @@ from collections import defaultdict
 class InstrType(Enum):
     LABEL = auto()
     EFFECT = auto()
-    CONST = ()
+    CONST = auto()
     VALUE = auto()
 
 
