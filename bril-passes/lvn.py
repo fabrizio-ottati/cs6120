@@ -39,16 +39,9 @@ return new_block
 """
 
 from dataclasses import dataclass, field
-from enum import Enum, auto
 from typing import Sequence
 from collections import defaultdict
-
-
-class InstrType(Enum):
-    LABEL = auto()
-    EFFECT = auto()
-    CONST = auto()
-    VALUE = auto()
+from utils import get_instr_type, InstrType
 
 
 class LVNTable:
@@ -68,15 +61,6 @@ class LVNTable:
         args = self.get_valn(instr["args"])
         args.sort()
         return [instr["op"], *args]
-
-    def get_instr_type(self, instr):
-        if "label" in instr:
-            return InstrType.LABEL
-        if "dest" not in instr:
-            return InstrType.EFFECT
-        if instr["op"] == "const":
-            return InstrType.CONST
-        return InstrType.VALUE
 
     def add_const_instr(self, instr):
         dest = instr["dest"]
@@ -104,7 +88,7 @@ class LVNTable:
         return idx
 
     def add_instr(self, instr):
-        instr_type = self.get_instr_type(instr)
+        instr_type = get_instr_type(instr)
         if instr_type in (InstrType.LABEL, InstrType.EFFECT):
             return None
 
@@ -178,7 +162,7 @@ class LVNTable:
 
     def build_instr(self, instr):
         self.add_instr(instr)
-        instr_type = self.get_instr_type(instr)
+        instr_type = get_instr_type(instr)
         if instr_type == InstrType.LABEL:
             new_instr = instr
         elif instr_type == InstrType.EFFECT:
