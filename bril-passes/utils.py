@@ -3,6 +3,8 @@
 import json, sys
 from enum import Enum, auto
 
+OPS_THAT_COMMUTE = ("mul", "add")
+
 
 class InstrType(Enum):
     LABEL = auto()
@@ -23,3 +25,7 @@ def get_instr_type(instr):
     if instr["op"] == "const":
         return InstrType.CONST
     return InstrType.VALUE
+
+
+def commutes(instr):
+    return instr.get("op", None) in OPS_THAT_COMMUTE

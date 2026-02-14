@@ -41,7 +41,7 @@ return new_block
 from dataclasses import dataclass, field
 from typing import Sequence
 from collections import defaultdict
-from utils import get_instr_type, InstrType
+from utils import get_instr_type, InstrType, commutes
 
 
 class LVNTable:
@@ -50,6 +50,12 @@ class LVNTable:
     var2valn: dict = dict()
     defs: list = []
     body: list = []
+    prefix: defaultdict = defaultdict(int)
+
+    def new_name(self, var):
+        name = f"lvn.{self.prefix[var]}.{var}"
+        self.prefix[var] += 1
+        return name
 
     def find_val(self, val):
         for i, (tval, tvar) in enumerate(self.table):
@@ -59,7 +65,12 @@ class LVNTable:
 
     def build_val(self, instr):
         args = self.get_valn(instr["args"])
-        args.sort()
+
+        if instr.get("op", None) == "id":
+            return self.table[args[0]][0]
+
+        if commutes(instr):
+            args.sort()
         return [instr["op"], *args]
 
     def add_const_instr(self, instr):
@@ -95,9 +106,9 @@ class LVNTable:
         dest = instr["dest"]
         if dest in self.defs:
             # Rename old variables.
-            new_name = dest
+            new_name = self.new_name(dest)
             while new_name in self.defs:
-                new_name = "%" + new_name
+                new_name = self.new_name(dest)
             # Table.
             valn = self.var2valn[dest]
             if self.table[valn][-1] == dest:
