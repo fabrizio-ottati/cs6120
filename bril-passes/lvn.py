@@ -55,7 +55,6 @@ class LVNTable:
     # [((op, *args), canonical_var)]
     table: list[tuple[tuple[str, Sequence[int]], str]] = []
     var2valn: dict = dict()
-    var2name: dict = dict()
     defs: list = []
     body: list = []
 
@@ -88,7 +87,6 @@ class LVNTable:
             return idx
         self.table.append([val, dest])
         idx = len(self.table) - 1
-        # self.valn2var[idx] = dest
         self.var2valn[dest] = idx
         return idx
 
@@ -102,13 +100,11 @@ class LVNTable:
 
         self.table.append([val, dest])
         idx = len(self.table) - 1
-        # self.valn2var[idx] = dest
         self.var2valn[dest] = idx
         return idx
 
     def add_instr(self, instr):
         instr_type = self.get_instr_type(instr)
-        # FIXME: We have to substitute also the args!
         if instr_type in (InstrType.LABEL, InstrType.EFFECT):
             return None
 
@@ -202,7 +198,6 @@ class LVNTable:
 
 def lvn_block(body):
     lvn_table = LVNTable()
-    new_body = []
     for instr in body:
         lvn_table.build_instr(instr)
     return lvn_table.get_body()
