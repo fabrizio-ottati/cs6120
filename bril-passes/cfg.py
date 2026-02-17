@@ -45,7 +45,17 @@ def form_cfg(body, bnum):
         if instr.get("op", "not_an_op") in TERMINATORS:
             if instr["op"] in ("br", "jmp"):
                 # FIXME
-                cfg[-1]["succs"] = instr["args"][1:]
+                if instr["op"] == "br":
+                    try:
+                        cfg[-1]["succs"] = instr["args"][1:]
+                    except KeyError:
+                        cfg[-1]["succs"] = instr["labels"][:]
+                if instr["op"] == "jmp":
+                    try:
+                        cfg[-1]["succs"] = instr["labels"][:]
+                    except KeyError:
+                        cfg[-1]["succs"] = instr["args"][:]
+
             new_block = True
         cfg[-1]["instrs"].append(instr)
     return cfg, bnum

@@ -224,7 +224,9 @@ def lvn_block(body):
     # Updating global variables.
     for v in lvn_table.globvars:
         if lvn_table.glob2local[v] != v:
-            new_body.append(dict(op="id", dest=v, args=[lvn_table.glob2local[v]]))
+            var = lvn_table.glob2local[v]
+            var = lvn_table.table[lvn_table.var2valn(var)][-1]
+            new_body.append(dict(op="id", dest=v, args=[var]))
 
     return new_body, lvn_table
 
